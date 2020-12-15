@@ -3,6 +3,7 @@ from typing import List
 import aicmder as cmder
 from aicmder.commands import register
 from aicmder.commands.utils import _command_prefix as cmd
+from aicmder.commands.utils import help_str
 import argparse
 from importlib import import_module
 import os, sys
@@ -62,3 +63,11 @@ class ONNXCommand:
         torch.onnx.export(model, dummy_input,os.path.join(save_dir, args.export),verbose=args.verbose)
         # print(model)
         return True
+
+    @staticmethod
+    def help():
+        str = "onnx example\n"
+        str += help_str("aicmder onnx -s output_dir -m './model/edsr.py' -c ckpt")
+        str += help_str("-s onnx model output dir")
+        str += help_str("-m py file of model")
+        return str

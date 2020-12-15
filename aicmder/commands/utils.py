@@ -55,3 +55,7 @@ def execute():
         index += 1
 
     return com['_entry']().execute(sys.argv[index:])
+
+
+def help_str(str):
+    return '    {:<15}        {}\n'.format('', str)

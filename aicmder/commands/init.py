@@ -7,7 +7,7 @@ import argparse
 import os
 from shutil import copyfile
 from pprint import pprint
-@register(name='{}.init'.format(cmd), description='init.')
+@register(name='{}.init'.format(cmd), description='init convertint environment')
 class InitCommand:
     
     _export_helper = 'export_helper.py'

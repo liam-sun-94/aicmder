@@ -25,7 +25,7 @@ setup(
     version=__version__,
 
     description='a simple ai cmder',
-    long_description=long_description,
+    long_description='Wait for updated',
 
     # The project's main homepage.
     # url='https://github.com/',
