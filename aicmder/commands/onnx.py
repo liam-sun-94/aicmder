@@ -1,3 +1,4 @@
+from aicmder.utils.utils import load_py_dir
 from typing import List
 
 import aicmder as cmder
@@ -41,10 +42,7 @@ class ONNXCommand:
         # sys.path.append(model_dir)
         
         ## import module
-        spec = importlib.util.spec_from_file_location(model_basename, os.path.join(model_dir, '__init__.py'))
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[spec.name] = module 
-        spec.loader.exec_module(module)
+        module = load_py_dir(model_dir)
 
         MODLE = import_module('{}.{}'.format(model_basename, model_name.replace('.py', '')))
         

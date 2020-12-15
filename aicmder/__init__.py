@@ -8,4 +8,14 @@ __version__ = '0.1.4'
 from aicmder.commands import *
 
 
+# module
+from aicmder.module.module import Module
+from aicmder.module.define import ModuleDefine
+from aicmder.module.module import serving, runnable
 
+# serving
+from aicmder.serving.worker import Worker
+
+
+# util
+# from aicmder.utils.utils import *
