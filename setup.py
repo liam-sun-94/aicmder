@@ -63,6 +63,15 @@ setup(
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
 
+
+    install_requires=[
+        'pyzmq>=17.1.0',
+        'GPUtil>=1.3.0',
+        'torch',
+        'onnx',
+        'onnx_tf'
+    ],
+
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.

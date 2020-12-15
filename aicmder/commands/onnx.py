@@ -7,6 +7,8 @@ import argparse
 from importlib import import_module
 import os, sys
 from pprint import pprint
+import torch
+import importlib.util
 @register(name='{}.onnx'.format(cmd), description='convert to onnx.')
 class ONNXCommand:
     
@@ -38,14 +40,13 @@ class ONNXCommand:
         # sys.path.append(model_dir)
         
         ## import module
-        import importlib.util
         spec = importlib.util.spec_from_file_location(model_basename, os.path.join(model_dir, '__init__.py'))
         module = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = module 
         spec.loader.exec_module(module)
 
         MODLE = import_module('{}.{}'.format(model_basename, model_name.replace('.py', '')))
-        import torch
+        
         device = 'cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu'
         # print(model_dir, module, spec.name, MODLE, args.gpu, device)
         

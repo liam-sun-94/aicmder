@@ -7,3 +7,4 @@ import aicmder.commands.utils
 import aicmder.commands.version
 import aicmder.commands.onnx
 import aicmder.commands.init
+import aicmder.commands.pb
