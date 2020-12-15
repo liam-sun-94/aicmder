@@ -15,7 +15,7 @@
 
 import base64
 import contextlib
-import cv2
+# import cv2
 import hashlib
 import importlib
 import math
@@ -155,49 +155,49 @@ def seconds_to_hms(seconds: int) -> str:
     return hms_str
 
 
-def cv2_to_base64(image: np.ndarray) -> str:
-    data = cv2.imencode('.jpg', image)[1]
-    return base64.b64encode(data.tostring()).decode('utf8')
+# def cv2_to_base64(image: np.ndarray) -> str:
+#     data = cv2.imencode('.jpg', image)[1]
+#     return base64.b64encode(data.tostring()).decode('utf8')
 
 
-def base64_to_cv2(b64str: str) -> np.ndarray:
-    '''Convert a string in base64 format to cv2 data'''
-    data = base64.b64decode(b64str.encode('utf8'))
-    data = np.fromstring(data, np.uint8)
-    data = cv2.imdecode(data, cv2.IMREAD_COLOR)
-    return data
+# def base64_to_cv2(b64str: str) -> np.ndarray:
+#     '''Convert a string in base64 format to cv2 data'''
+#     data = base64.b64decode(b64str.encode('utf8'))
+#     data = np.fromstring(data, np.uint8)
+#     data = cv2.imdecode(data, cv2.IMREAD_COLOR)
+#     return data
 
 
-@contextlib.contextmanager
-def generate_tempfile(directory: str = None, **kwargs):
-    '''Generate a temporary file'''
-    directory = hubenv.TMP_HOME if not directory else directory
-    with tempfile.NamedTemporaryFile(dir=directory, **kwargs) as file:
-        yield file
+# @contextlib.contextmanager
+# def generate_tempfile(directory: str = None, **kwargs):
+#     '''Generate a temporary file'''
+#     directory = hubenv.TMP_HOME if not directory else directory
+#     with tempfile.NamedTemporaryFile(dir=directory, **kwargs) as file:
+#         yield file
 
 
-@contextlib.contextmanager
-def generate_tempdir(directory: str = None, **kwargs):
-    '''Generate a temporary directory'''
-    directory = hubenv.TMP_HOME if not directory else directory
-    with tempfile.TemporaryDirectory(dir=directory, **kwargs) as _dir:
-        yield _dir
+# @contextlib.contextmanager
+# def generate_tempdir(directory: str = None, **kwargs):
+#     '''Generate a temporary directory'''
+#     directory = hubenv.TMP_HOME if not directory else directory
+#     with tempfile.TemporaryDirectory(dir=directory, **kwargs) as _dir:
+#         yield _dir
 
 
-def download(url: str, path: str = None) -> str:
-    '''
-    Download a file
-    Args:
-        url (str) : url to be downloaded
-        path (str, optional) : path to store downloaded products, default is current work directory
-    Examples:
-        .. code-block:: python
-            url = 'https://xxxxx.xx/xx.tar.gz'
-            download(url, path='./output')
-    '''
-    for savename, _, _ in download_with_progress(url, path):
-        ...
-    return savename
+# def download(url: str, path: str = None) -> str:
+#     '''
+#     Download a file
+#     Args:
+#         url (str) : url to be downloaded
+#         path (str, optional) : path to store downloaded products, default is current work directory
+#     Examples:
+#         .. code-block:: python
+#             url = 'https://xxxxx.xx/xx.tar.gz'
+#             download(url, path='./output')
+#     '''
+#     for savename, _, _ in download_with_progress(url, path):
+#         ...
+#     return savename
 
 
 def download_with_progress(url: str, path: str = None) -> Generator[str, int, int]:
@@ -287,27 +287,27 @@ def md5(text: str):
     return md5code.hexdigest()
 
 
-def record(msg: str) -> str:
-    '''Record the specified text into the PaddleHub log file witch will be automatically stored according to date.'''
-    logfile = get_record_file()
-    with open(logfile, 'a') as file:
-        file.write('=' * 50 + '\n')
-        file.write('Record at ' + time.strftime('%Y-%m-%d %H:%M:%S') + '\n')
-        file.write('=' * 50 + '\n')
-        file.write(str(msg) + '\n' * 3)
+# def record(msg: str) -> str:
+#     '''Record the specified text into the PaddleHub log file witch will be automatically stored according to date.'''
+#     logfile = get_record_file()
+#     with open(logfile, 'a') as file:
+#         file.write('=' * 50 + '\n')
+#         file.write('Record at ' + time.strftime('%Y-%m-%d %H:%M:%S') + '\n')
+#         file.write('=' * 50 + '\n')
+#         file.write(str(msg) + '\n' * 3)
 
-    return logfile
-
-
-def record_exception(msg: str) -> str:
-    '''Record the current exception infomation into the PaddleHub log file witch will be automatically stored according to date.'''
-    tb = traceback.format_exc()
-    file = record(tb)
-    utils.log.logger.warning('{}. Detailed error information can be found in the {}.'.format(msg, file))
+#     return logfile
 
 
-def get_record_file() -> str:
-    return os.path.join(hubenv.LOG_HOME, time.strftime('%Y%m%d.log'))
+# def record_exception(msg: str) -> str:
+#     '''Record the current exception infomation into the PaddleHub log file witch will be automatically stored according to date.'''
+#     tb = traceback.format_exc()
+#     file = record(tb)
+#     utils.log.logger.warning('{}. Detailed error information can be found in the {}.'.format(msg, file))
+
+
+# def get_record_file() -> str:
+#     return os.path.join(hubenv.LOG_HOME, time.strftime('%Y%m%d.log'))
 
 
 def is_port_occupied(ip: str, port: int) -> bool:
