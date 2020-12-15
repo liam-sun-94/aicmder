@@ -159,3 +159,8 @@ for arg in vars(args):
     elif vars(args)[arg] == 'False':
         vars(args)[arg] = False
 
+
+import torch
+from torch.autograd import Variable
+patch_size = 224
+dummy_input = Variable(torch.randn(1, 3, patch_size, patch_size))

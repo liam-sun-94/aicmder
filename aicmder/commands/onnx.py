@@ -10,6 +10,8 @@ from pprint import pprint
 @register(name='{}.onnx'.format(cmd), description='convert to onnx.')
 class ONNXCommand:
     
+    _helper = 'export_helper'
+    
     def __init__(self) -> None:
         self.description = 'Start to convert to onnx model'
         self.parser = argparse.ArgumentParser(description=self.__class__.__doc__, prog='{} onnx'.format(cmd), usage='%(prog)s', add_help=True)
@@ -17,6 +19,8 @@ class ONNXCommand:
         self.parser.add_argument('--model', '-m', required=True)
         self.parser.add_argument('--ckpt', '-c', required=True)
         self.parser.add_argument('--gpu', action="store_true", default=False)
+        self.parser.add_argument('--verbose', action="store_true", default=False)
+        self.parser.add_argument('--export', '-e', default='export.onnx')
         self.cur_path = os.path.abspath(os.path.dirname(__file__))
         
         
@@ -30,6 +34,8 @@ class ONNXCommand:
         model_dir = os.path.dirname(args.model)
         model_basename = os.path.basename(model_dir)
         # sys.path.append(model_dir)
+        
+        ## import module
         import importlib.util
         spec = importlib.util.spec_from_file_location(model_basename, os.path.join(model_dir, '__init__.py'))
         module = importlib.util.module_from_spec(spec)
@@ -41,20 +47,15 @@ class ONNXCommand:
         device = 'cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu'
         # print(model_dir, module, spec.name, MODLE, args.gpu, device)
         
-        ARGS = import_module('{}.args'.format(model_basename))
-
-        model = MODLE.make_model(ARGS.args).to(device)
+        ## build model
+        export_helper = import_module('{}.{}'.format(model_basename, self._helper))
+        model = MODLE.make_model(export_helper.args).to(device)
         state_dicts = torch.load(args.ckpt, map_location=device)
         model.load_state_dict(state_dicts)
         print('load model success.')
         
-        
-        # patch_size = 224
-        # dummy_input = Variable(torch.randn(1, 3, patch_size, patch_size)).cuda()
-        # # dummy_input.to('cuda:1')
-        # onnx_filename = "new_edsr.onnx"
-        # torch.onnx.export(model, dummy_input,onnx_filename,verbose=True)
-        
-        
+        ## export model
+        dummy_input = export_helper.dummy_input.to(device)
+        torch.onnx.export(model, dummy_input,args.export,verbose=args.verbose)
         # print(model)
         return True
