@@ -1,7 +1,9 @@
 import types
 import packaging.version
-import sys, os
+import sys
+import os
 import importlib
+
 
 class Version(packaging.version.Version):
     '''Extended implementation of packaging.version.Version'''
@@ -69,14 +71,15 @@ class Version(packaging.version.Version):
         return super().__eq__(other)
 
 
-
 def load_py_dir(python_dir: str):
     model_basename = os.path.basename(python_dir)
-    spec = importlib.util.spec_from_file_location(model_basename, os.path.join(python_dir, '__init__.py'))
+    spec = importlib.util.spec_from_file_location(
+        model_basename, os.path.join(python_dir, '__init__.py'))
     module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module 
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
 
 def load_py_module(python_path: str, py_module_name: str) -> types.ModuleType:
     '''
@@ -93,9 +96,7 @@ def load_py_module(python_path: str, py_module_name: str) -> types.ModuleType:
     # before uninstallation, this can cause some strange problems, e.g, fail to load model parameters.
     if py_module_name in sys.modules:
         sys.modules.pop(py_module_name)
-        
-    print(python_path, py_module_name)
-    
+
     py_module = importlib.import_module(py_module_name)
     sys.path.pop(0)
 

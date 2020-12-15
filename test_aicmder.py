@@ -17,12 +17,12 @@ class TestCommands(unittest.TestCase):
     #     init = cmder.init.InitCommand()
     #     init.execute([])
 
-    def test_onnx(self):
-        print(cmder)
-        onnx = cmder.onnx.ONNXCommand()
-        # onnx.execute(['-s', './save'])
-        onnx.execute(['-s', 'output', '-m', '/Users/faith/AI_Commander/model/edsr.py',
-                      '-c', '/Users/faith/AI_Commander/edsr_baseline_x4-6b446fab.pt'])
+    # def test_onnx(self):
+    #     print(cmder)
+    #     onnx = cmder.onnx.ONNXCommand()
+    #     # onnx.execute(['-s', './save'])
+    #     onnx.execute(['-s', 'output', '-m', '/Users/faith/AI_Commander/model/edsr.py',
+    #                   '-c', '/Users/faith/AI_Commander/edsr_baseline_x4-6b446fab.pt'])
 
     # def test_init(self):
     #     init = cmder.pb.PbCommand()

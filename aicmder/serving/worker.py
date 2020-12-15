@@ -17,8 +17,11 @@ class Worker(Process):
         init_args = module_info.get('init_args', {})
         init_args.update({'name': self.module})
         module = cmder.Module(**init_args)
-        
-        print(module)
+        method_name = module.serving_func_name
+        serving_method = getattr(module, method_name)
+        # print(module, type(method_name), serving_method, type(serving_method))
+        # print('----')
+        serving_method()
         
     def run(self) -> None:
         return super().run()

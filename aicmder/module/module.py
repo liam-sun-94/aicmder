@@ -83,6 +83,23 @@ class Module(object):
 
         return module
 
+    def _get_func_name(self, current_cls, module_func_dict: dict):
+        mod = current_cls.__module__ + '.' + current_cls.__name__
+        if mod in module_func_dict:
+            _func_name = module_func_dict[mod]
+            return _func_name
+        elif current_cls.__bases__:
+            for base_class in current_cls.__bases__:
+                base_run_func = self._get_func_name(base_class, module_func_dict)
+                if base_run_func:
+                    return base_run_func
+        else:
+            return None
+
+    @property
+    def serving_func_name(self):
+        return self._get_func_name(self.__class__, _module_serving_func)
+
     @classmethod
     def load(cls, directory: str):
         '''Load the Module object defined in the specified directory.'''
@@ -97,10 +114,6 @@ class Module(object):
         dirname = os.path.dirname(directory)
         load_py_dir(os.path.join(os.getcwd(), dirname))
         py_module = load_py_module(dirname, basename)
-
-        # basename = os.path.split(directory)[-1]
-        # dirname = os.path.join(*list(os.path.split(directory)[:-1]))
-        # py_module = load_py_module(dirname, '{}.module'.format(basename))
 
         for _item, _cls in inspect.getmembers(py_module, inspect.isclass):
             _item = py_module.__dict__[_item]
