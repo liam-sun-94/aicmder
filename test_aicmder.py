@@ -13,7 +13,7 @@ class TestCommands(unittest.TestCase):
         print(cmder)
         onnx = cmder.onnx.ONNXCommand()
         # onnx.execute(['-s', './save'])
-        onnx.execute(['-s', 'aaaa', '-m', '/Users/faith/AI_Commander/model/edsr.py', '-c', '/Users/faith/AI_Commander/edsr_baseline_x4-6b446fab.pt'])
+        onnx.execute(['-s', 'output', '-m', '/Users/faith/AI_Commander/model/edsr.py', '-c', '/Users/faith/AI_Commander/edsr_baseline_x4-6b446fab.pt'])
 
 if __name__ == "__main__":
     unittest.main()

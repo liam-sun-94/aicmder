@@ -1,6 +1,7 @@
 import argparse
 # import template
 
+print('export helper')
 parser = argparse.ArgumentParser(description='model agrs')
 
 parser.add_argument('--debug', action='store_true',
@@ -143,7 +144,7 @@ parser.add_argument('--save_results', action='store_true',
 parser.add_argument('--save_gt', action='store_true',
                     help='save low-resolution and high-resolution images together')
 
-args = parser.parse_args()
+args = parser.parse_args([])
 # template.set_template(args)
 
 args.scale = list(map(lambda x: int(x), args.scale.split('+')))

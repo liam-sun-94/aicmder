@@ -29,6 +29,8 @@ class ONNXCommand:
         args = self.parser.parse_args(argv)
         save_dir = self.cur_path if args.save_dir is None else args.save_dir
         assert os.path.exists(args.model) and os.path.exists(args.ckpt)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         
         model_name = os.path.basename(args.model)
         model_dir = os.path.dirname(args.model)
@@ -56,6 +58,6 @@ class ONNXCommand:
         
         ## export model
         dummy_input = export_helper.dummy_input.to(device)
-        torch.onnx.export(model, dummy_input,args.export,verbose=args.verbose)
+        torch.onnx.export(model, dummy_input,os.path.join(save_dir, args.export),verbose=args.verbose)
         # print(model)
         return True
