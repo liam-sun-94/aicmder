@@ -37,11 +37,24 @@ class ONNXCommand:
         spec.loader.exec_module(module)
 
         MODLE = import_module('{}.{}'.format(model_basename, model_name.replace('.py', '')))
-        print(model_dir, module, spec.name, MODLE, args.gpu)
         import torch
-        device = 'cuda' if args.gpu else 'cpu'
-        torch.device(device)
-        state_dicts = torch.load(args.ckpt)
-        MODLE.load_state_dict(state_dicts)
-        print(MODULE)
+        device = 'cuda:0' if args.gpu and torch.cuda.is_available() else 'cpu'
+        # print(model_dir, module, spec.name, MODLE, args.gpu, device)
+        
+        ARGS = import_module('{}.args'.format(model_basename))
+
+        model = MODLE.make_model(ARGS.args).to(device)
+        state_dicts = torch.load(args.ckpt, map_location=device)
+        model.load_state_dict(state_dicts)
+        print('load model success.')
+        
+        
+        # patch_size = 224
+        # dummy_input = Variable(torch.randn(1, 3, patch_size, patch_size)).cuda()
+        # # dummy_input.to('cuda:1')
+        # onnx_filename = "new_edsr.onnx"
+        # torch.onnx.export(model, dummy_input,onnx_filename,verbose=True)
+        
+        
+        # print(model)
         return True
