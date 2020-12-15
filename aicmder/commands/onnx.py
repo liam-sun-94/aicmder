@@ -22,7 +22,7 @@ class ONNXCommand:
         
         
     def execute(self, argv: List) -> bool:
-        pprint('convert to onnx')
+        pprint('convert to onnx!!')
         args = self.parser.parse_args(argv)
         save_dir = self.cur_path if args.save_dir is None else args.save_dir
         
