@@ -1,5 +1,5 @@
 from typing import List
-
+from aicmder.commands.utils import help_str
 import aicmder as cmder
 from aicmder.commands import register
 from aicmder.commands.utils import _command_prefix as cmd
