@@ -1,4 +1,5 @@
 from multiprocessing import Process
+import multiprocessing
 import aicmder as cmder
 import json
 from aicmder.service.PPpolicy import *
@@ -44,6 +45,7 @@ class Worker(Process):
             serving_method = getattr(module, method_name)
             # serving_args = module_info.get(ModuleParams, {})
             self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
+        self.is_ready = multiprocessing.Event()
         print(self.serving_methods)
         
     def run(self):    
@@ -52,7 +54,7 @@ class Worker(Process):
 
         liveness = HEARTBEAT_LIVENESS
         interval = INTERVAL_INIT
-
+        self.is_ready.set()
         heartbeat_at = time.time() + HEARTBEAT_INTERVAL
 
         worker = worker_socket(context, poller)

@@ -30,14 +30,20 @@ class TestCommands(unittest.TestCase):
 
 
 def test_worker():
-    predict_params = {'str': '今天吃饭了吗'}
-    worker = cmder.Worker(
-        {'albert': {'name': 'tests_model/AlbertModule', 'serving_args': predict_params, 'init_args': {'dummpy_params': 'dummpy'}}})
-    worker.start()
+    workers = []
+    device_map = ["cpu" for i in range(5)]
+    for idx, device_id in enumerate(device_map):
+        predict_params = {'str': '今天吃饭了吗'}
+        worker = cmder.Worker(
+            {'albert': {'name': 'tests_model/AlbertModule', 'serving_args': predict_params, 'init_args': {'dummpy_params': 'dummpy'}}})
+        workers.append(worker)
+        worker.start()
+    for worker in workers:
+        worker.is_ready.wait()
     queue = cmder.ServerQueue()
     queue.start()
     queue.join()
-    worker.join()
+    
 
 
 def test_PPworker():
