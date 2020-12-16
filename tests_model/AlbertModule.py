@@ -5,7 +5,9 @@ from aicmder.module.module import serving, moduleinfo
 class Albert(cmder.Module):
     @serving
     def predict(self):
-        print('hello')
+        import time
+        time.sleep(1)
+        return 'hello world'
         
         
         

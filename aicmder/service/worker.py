@@ -16,6 +16,9 @@ def worker_socket(context, poller):
     worker.connect("tcp://localhost:5556")
     worker.send(PPP_READY)
     return worker
+
+ModuleName = cmder.ModuleDefine.ModuleName.str()
+ModuleMethod = cmder.ModuleDefine.ModuleMethod.str()
 class Worker(Process):
     
     
@@ -24,24 +27,20 @@ class Worker(Process):
         self.module_infos = json.loads(module_infos) if type(module_infos) == str else module_infos
         self.device_id = device_id
         self.kwargs = kwargs
-        
-        self.context = zmq.Context(1)
-        self.poller = zmq.Poller()
-        # start connections
-        self.worker = worker_socket(self.context, self.poller)
-        
-        # for module_name, module_info in self.module_infos.items():
-        #     print(module_name, module_info)
-        
-        # # self.module = self.module_info[module_name] or self.kwargs.get(module_name)
-        # # assert self.module is not None
-        #     init_args = module_info.get('init_args', {})
-        #     init_args.update({'name': module_info['name']})
-        #     module = cmder.Module(**init_args)
-        #     method_name = module.serving_func_name
-        #     serving_method = getattr(module, method_name)
+        assert len(self.module_infos) > 0
+        self.serving_methods = {}
 
-        #     serving_method()
+        for module_name, module_info in self.module_infos.items():
+            print(module_name, module_info)
+            
+            init_args = module_info.get('init_args', {})
+            init_args.update({ModuleName: module_info[ModuleName]})
+            module = cmder.Module(**init_args)
+            method_name = module.serving_func_name
+            serving_method = getattr(module, method_name)
+            print(serving_method)
+            self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
+        print(self.serving_methods)
         
     def run(self):    
         context = zmq.Context(1)
@@ -66,7 +65,7 @@ class Worker(Process):
                     break # Interrupted
 
                 if len(frames) == 3:
-                    frames[len(frames) - 1] = "回应".encode()
+                    frames[len(frames) - 1] = self.serving_methods['albert'][ModuleMethod]().encode()
                     print("I: Normal reply", frames)
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS

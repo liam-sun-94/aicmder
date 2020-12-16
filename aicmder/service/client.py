@@ -32,7 +32,7 @@ def send_request(client, request):
         if (client.poll(REQUEST_TIMEOUT) & zmq.POLLIN) != 0:
             reply = client.recv()
             logging.info("Server replied msg (%s)", reply.decode())
-            break
+            return reply
         
         retries_left -= 1
         logging.warning("No response from server")
