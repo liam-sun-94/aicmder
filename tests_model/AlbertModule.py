@@ -6,3 +6,10 @@ class Albert(cmder.Module):
     @serving
     def predict(self):
         print('hello')
+        
+        
+        
+class Foo:
+    
+    def test():
+        pass

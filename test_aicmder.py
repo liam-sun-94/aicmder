@@ -5,7 +5,8 @@ import aicmder as cmder
 class TestCommands(unittest.TestCase):
 
     def test_worker(self):
-        worker = cmder.Worker({'name': 'tests_model/AlbertModule'})
+        worker = cmder.Worker(
+            {'albert': {'name': 'tests_model/AlbertModule'}})
         worker.start()
 
     # def test_help(self):
