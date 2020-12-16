@@ -5,7 +5,7 @@ from aicmder.service.PPpolicy import *
 from random import randint
 import time
 import zmq
-
+import datetime
 def worker_socket(context, poller):
     """Helper function that returns a new configured socket
        connected to the Paranoid Pirate queue"""
@@ -71,7 +71,7 @@ class Worker(Process):
                     liveness = HEARTBEAT_LIVENESS
                     time.sleep(1)  # Do some heavy work
                 elif len(frames) == 1 and frames[0] == PPP_HEARTBEAT:
-                    print("I: Queue heartbeat")
+                    print("I: Queue heartbeat", datetime.datetime.now())
                     liveness = HEARTBEAT_LIVENESS
                 else:
                     print("E: Invalid message: %s" % frames)
@@ -92,5 +92,5 @@ class Worker(Process):
                     liveness = HEARTBEAT_LIVENESS
             if time.time() > heartbeat_at:
                 heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-                print("I: Worker heartbeat")
+                print("I: Worker heartbeat", datetime.datetime.now())
                 worker.send(PPP_HEARTBEAT)

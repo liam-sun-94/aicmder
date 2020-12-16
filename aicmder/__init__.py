@@ -15,6 +15,9 @@ from aicmder.module.module import serving, runnable
 
 # serving
 from aicmder.service.worker import Worker
+from aicmder.service.server import ServerQueue
+
+
 from aicmder.service.PPworker import PPworker
 
 # util

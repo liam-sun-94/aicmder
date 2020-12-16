@@ -34,6 +34,9 @@ def test_worker():
     worker = cmder.Worker(
         {'albert': {'name': 'tests_model/AlbertModule'}})
     worker.start()
+    queue = cmder.ServerQueue()
+    queue.start()
+    
 
 def test_PPworker():
     worker = cmder.PPworker()
