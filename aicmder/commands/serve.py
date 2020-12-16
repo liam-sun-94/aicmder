@@ -7,14 +7,86 @@ import argparse
 import os
 from shutil import copyfile
 from pprint import pprint
+import json
+
+def is_json(config):
+  try:
+    json_object = json.loads(config)
+  except ValueError as e:
+    return False
+  return True
+
+
 @register(name='{}.serve'.format(cmd), description='start all module')
 class ServeCommand:
-    
+
     def __init__(self) -> None:
-        self.parser = argparse.ArgumentParser(description=self.__class__.__doc__, prog='{} serve'.format(cmd), usage='%(prog)s', add_help=True)
-        self.parser.add_argument('--workers', '-w', default=1)
+        self.parser = argparse.ArgumentParser(
+            description=self.__class__.__doc__, prog='{} serve'.format(cmd), usage='%(prog)s', add_help=True)
+        self.parser.add_argument('--workers', '-w', type=int, default=1, help='number of server instances')
+        self.parser.add_argument('--config', '-c', required=True)
+        self.parser.add_argument('-device_map', type=int, nargs='+', default=[],
+                                 help='specify the list of GPU device ids that will be used (id starts from 0). \
+                        If num_worker > len(device_map), then device will be reused; \
+                        if num_worker < len(device_map), then device_map[:num_worker] will be used')
+        self.parser.add_argument('-cpu', action='store_true', default=False,
+                                 help='running on CPU (default on GPU)')
+        
+    def _get_device_map(self):
+        # self.logger.info('get devices')
+        run_on_gpu = False
+        device_map = [-1] * self.num_worker
+        if not self.args.cpu:
+            try:
+                import GPUtil
+                num_all_gpu = len(GPUtil.getGPUs())
+                avail_gpu = GPUtil.getAvailable(order='memory', limit=min(num_all_gpu, self.num_worker),
+                                                maxMemory=0.9, maxLoad=0.9)
+                num_avail_gpu = len(avail_gpu)
+
+                if num_avail_gpu >= self.num_worker:
+                    run_on_gpu = True
+                elif 0 < num_avail_gpu < self.num_worker:
+                    # self.logger.warning('only %d out of %d GPU(s) is available/free, but "-num_worker=%d"' %
+                    #                     (num_avail_gpu, num_all_gpu, self.num_worker))
+                    # if not self.args.device_map:
+                    #     self.logger.warning('multiple workers will be allocated to one GPU, '
+                    #                         'may not scale well and may raise out-of-memory')
+                    # else:
+                    #     self.logger.warning('workers will be allocated based on "-device_map=%s", '
+                    #                         'may not scale well and may raise out-of-memory' % self.args.device_map)
+                    run_on_gpu = True
+                else:
+                    print('no GPU available, fall back to CPU')
+                    # self.logger.warning('no GPU available, fall back to CPU')
+
+                if run_on_gpu:
+                    device_map = ((self.args.device_map or avail_gpu) * self.num_worker)[: self.num_worker]
+            except FileNotFoundError:
+                print('nvidia-smi is missing, often means no gpu on this machine. '
+                                    'fall back to cpu!')
+        print('device map: \n\t\t%s' % '\n\t\t'.join(
+            'worker %2d -> %s' % (w_id, ('gpu %2d' % g_id) if g_id >= 0 else 'cpu') for w_id, g_id in
+            enumerate(device_map)))
+        return device_map
 
     def execute(self, argv: List) -> bool:
-        args = self.parser.parse_args(argv)
-        
+        print(argv)
+        self.args = self.parser.parse_args(argv)
+        self.num_worker = self.args.workers
+        device_map = self._get_device_map()
+        print(device_map)
+        assert is_json(self.args.config) == True
+        config = json.loads(self.args.config)
+    
+        workers = []
+        for idx, device_id in enumerate(device_map):
+            worker = cmder.Worker(config, device_id=device_id)
+            workers.append(worker)
+            worker.start()
+        for worker in workers:
+            worker.is_ready.wait()
+        queue = cmder.ServerQueue()
+        queue.start()
+        queue.join()
         

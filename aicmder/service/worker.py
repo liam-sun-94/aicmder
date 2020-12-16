@@ -22,6 +22,7 @@ ModuleName = cmder.ModuleDefine.ModuleName.str()
 ModuleMethod = cmder.ModuleDefine.ModuleMethod.str()
 ModuleInitArgs = cmder.ModuleDefine.ModuleInitArgs.str()
 ModuleParams = cmder.ModuleDefine.ModuleParams.str()
+DeviceId = cmder.ModuleDefine.DeviceId.str()
 class Worker(Process):
     
     
@@ -37,7 +38,7 @@ class Worker(Process):
             print(module_name, module_info)
             
             init_args = module_info.get(ModuleInitArgs, {})
-            init_args.update({ModuleName: module_info[ModuleName]})
+            init_args.update({ModuleName: module_info[ModuleName], DeviceId: self.device_id})
             init_args.update(module_info[ModuleInitArgs])
             
             module = cmder.Module(**init_args)
@@ -46,7 +47,7 @@ class Worker(Process):
             # serving_args = module_info.get(ModuleParams, {})
             self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
         self.is_ready = multiprocessing.Event()
-        print(self.serving_methods)
+        
         
     def run(self):    
         context = zmq.Context(1)

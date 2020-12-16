@@ -10,7 +10,10 @@ class Albert(cmder.Module):
     def __init__(self, dummpy_params, **kwargs):
         self.dummpy_params = dummpy_params
         self.pretrained = '/Users/faith/jx3cloud_QA/rasa_action/models/ALBERT'
-        self.device = 'cpu'
+        self.device = int(kwargs['device_id'])
+        self.device = "cuda:{}".format(self.device) if self.device >= 0 else "cpu"
+
+        print('Albert', self.device)
         self.bert = None
         self.tokenizer = BertTokenizer.from_pretrained(self.pretrained)
         

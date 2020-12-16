@@ -11,3 +11,4 @@ try:
     import aicmder.commands.pb
 except:
     pass
+import aicmder.commands.serve

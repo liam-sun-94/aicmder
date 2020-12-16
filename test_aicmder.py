@@ -1,6 +1,6 @@
 import unittest
 import aicmder as cmder
-import time
+import time, json 
 class TestCommands(unittest.TestCase):
 
     def test_worker(self):
@@ -31,11 +31,10 @@ class TestCommands(unittest.TestCase):
 
 def test_worker():
     workers = []
+    config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
     device_map = ["cpu" for i in range(5)]
     for idx, device_id in enumerate(device_map):
-        predict_params = {'str': '今天吃饭了吗'}
-        worker = cmder.Worker(
-            {'albert': {'name': 'tests_model/AlbertModule', 'serving_args': predict_params, 'init_args': {'dummpy_params': 'dummpy'}}})
+        worker = cmder.Worker(config, device_id=device_id)
         workers.append(worker)
         worker.start()
     for worker in workers:
@@ -58,10 +57,17 @@ def test_albert():
     from tests_model.AlbertModule import Albert   
     albert = Albert(**{'dummpy_params': 'dummpy'})
     print(albert.predict('今天吃饭了吗'))
+    
+def test_serving():
+    print(cmder)
+    config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
+    serve = cmder.serve.ServeCommand()
+    serve.execute(['-w', '5', '-c', json.dumps(config)])
 
 if __name__ == "__main__":
     # d = {'c': 123, 'd': 123}
     # test_func({'a': 123, 'b': 123}, **d)
-    test_worker()
+    # test_worker()
     # test_albert()
     # unittest.main()
+    test_serving()
