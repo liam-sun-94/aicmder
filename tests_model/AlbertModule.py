@@ -1,18 +1,51 @@
 import aicmder as cmder
 from aicmder.module.module import serving, moduleinfo
-
+from transformers import *
+import torch
+import json
+import numpy as np
 @moduleinfo(name='albert')
 class Albert(cmder.Module):
     
     def __init__(self, dummpy_params, **kwargs):
         self.dummpy_params = dummpy_params
+        self.pretrained = '/Users/faith/jx3cloud_QA/rasa_action/models/ALBERT'
+        self.device = 'cpu'
+        self.bert = None
+        self.tokenizer = BertTokenizer.from_pretrained(self.pretrained)
+        
+    def evaluate(self, inputtext):
+        encoding = self.tokenizer(inputtext, return_tensors='pt', padding=True, return_length=True)
+
+        with torch.no_grad():
+            input_ids = encoding['input_ids']
+            # input_len = encoding['length'].to(self.device)
+            mask = encoding['attention_mask']
+            if self.device != 'cpu':
+                mask = mask.to(self.device)
+                input_ids = input_ids.to(self.device)
+            outputs = self.bert(input_ids, attention_mask=mask)
+            ret = outputs[0] # outputs.last_hidden_state 等价
+
+            if self.device != 'cpu':
+                cpu_ret = ret.cpu().detach().numpy()
+                cpu_mask = mask.cpu().detach().numpy()
+            else:
+                cpu_ret = ret
+                cpu_mask = mask
+            result = np.dot(cpu_mask, cpu_ret.squeeze(0))
+
+            return torch.tensor(result).numpy().tolist()
     
     @serving
-    def predict(self):
-        str = '123'
-        import time
-        time.sleep(1)
-        return 'hello world' + self.dummpy_params + ' {}'.format(str)
+    def predict(self, str):
+        if self.bert is None:
+            self.bert = AlbertModel.from_pretrained(self.pretrained, output_attentions=False, output_hidden_states=True)
+            self.bert.to(self.device)
+            self.bert.eval()
+        print('begin predict', str)
+        result = self.evaluate(str)
+        return json.dumps(result)
         
         
         

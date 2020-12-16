@@ -5,7 +5,7 @@ from aicmder.service.PPpolicy import *
 from random import randint
 import time
 import zmq
-import datetime
+import datetime, json
 def worker_socket(context, poller):
     """Helper function that returns a new configured socket
        connected to the Paranoid Pirate queue"""
@@ -42,8 +42,8 @@ class Worker(Process):
             module = cmder.Module(**init_args)
             method_name = module.serving_func_name
             serving_method = getattr(module, method_name)
-            serving_args = module_info.get(ModuleParams, {})
-            self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method, ModuleParams: serving_args}
+            # serving_args = module_info.get(ModuleParams, {})
+            self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
         print(self.serving_methods)
         
     def run(self):    
@@ -70,9 +70,10 @@ class Worker(Process):
 
                 if len(frames) == 3:
                     module = self.serving_methods['albert']
-                    serving_args = module[ModuleParams]
-                    
-                    frames[len(frames) - 1] = module[ModuleMethod](**serving_args).encode()
+                    serving_args = frames[len(frames) - 1].decode()
+                    serving_args_dict = json.loads(serving_args)
+                    print(serving_args, serving_args_dict)
+                    frames[len(frames) - 1] = module[ModuleMethod](**serving_args_dict).encode()
                     print("I: Normal reply", frames)
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS

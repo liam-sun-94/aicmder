@@ -9,11 +9,11 @@ import itertools
 import logging
 import sys
 import zmq
-import time
+import time, json
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 # 3s for timeout
-REQUEST_TIMEOUT = 3000 #2500 
+REQUEST_TIMEOUT = 10000 #2500 
 REQUEST_RETRIES = 3
 SERVER_ENDPOINT = "tcp://localhost:5555"
 
@@ -51,7 +51,8 @@ def send_request(client, request):
         client.send(request)
 
 for sequence in itertools.count():
-    sequence = "啊哈哈" + str(sequence)
+    sequence = {'str': '今天吃饭了吗'}
+    sequence = json.dumps(sequence)
     request = sequence.encode()
     logging.info("Sending (%s)", request)
     send_request(client, request)
