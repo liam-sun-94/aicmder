@@ -15,7 +15,7 @@ class WorkerQueue(object):
         self.queue = OrderedDict()
 
     def ready(self, worker):
-        print('I: worker: {} ready, the address is {}'.format(worker, worker.address), datetime.datetime.now())
+        # print('I: worker: {} ready, the address is {}'.format(worker, worker.address), datetime.datetime.now())
         self.queue.pop(worker.address, None)
         self.queue[worker.address] = worker
 
@@ -71,7 +71,6 @@ class ServerQueue(Process):
                     break
 
                 address = frames[0]
-                print(frames, datetime.datetime.now())
                 workers.ready(Worker(address))
 
                 # Validate control message, or return reply to client

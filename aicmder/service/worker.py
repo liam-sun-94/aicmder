@@ -66,12 +66,13 @@ class Worker(Process):
                     break # Interrupted
 
                 if len(frames) == 3:
-                    print("I: Normal reply")
+                    frames[len(frames) - 1] = "回应".encode()
+                    print("I: Normal reply", frames)
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS
-                    time.sleep(1)  # Do some heavy work
+                    
                 elif len(frames) == 1 and frames[0] == PPP_HEARTBEAT:
-                    print("I: Queue heartbeat", datetime.datetime.now())
+                    # print("I: Queue heartbeat", datetime.datetime.now())
                     liveness = HEARTBEAT_LIVENESS
                 else:
                     print("E: Invalid message: %s" % frames)
@@ -92,5 +93,5 @@ class Worker(Process):
                     liveness = HEARTBEAT_LIVENESS
             if time.time() > heartbeat_at:
                 heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-                print("I: Worker heartbeat", datetime.datetime.now())
+                # print("I: Worker heartbeat", datetime.datetime.now())
                 worker.send(PPP_HEARTBEAT)
