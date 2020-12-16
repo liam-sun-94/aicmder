@@ -6,7 +6,7 @@
 
 from collections import OrderedDict
 import time
-from .PPpolicy import *
+from PPpolicy import *
 import zmq
 
 

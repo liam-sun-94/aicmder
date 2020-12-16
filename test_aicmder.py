@@ -30,5 +30,15 @@ class TestCommands(unittest.TestCase):
     #     init.execute(['-o', 'output/export.onnx'])
 
 
+def test_worker():
+    worker = cmder.Worker(
+        {'albert': {'name': 'tests_model/AlbertModule'}})
+    worker.start()
+
+def test_PPworker():
+    worker = cmder.PPworker()
+    worker.start()
+    
 if __name__ == "__main__":
-    unittest.main()
+    test_worker()
+    # unittest.main()

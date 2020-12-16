@@ -14,8 +14,8 @@ from aicmder.module.define import ModuleDefine
 from aicmder.module.module import serving, runnable
 
 # serving
-from aicmder.serving.worker import Worker
-
+from aicmder.service.worker import Worker
+from aicmder.service.PPworker import PPworker
 
 # util
 # from aicmder.utils.utils import *
