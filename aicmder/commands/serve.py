@@ -25,6 +25,8 @@ class ServeCommand:
             description=self.__class__.__doc__, prog='{} serve'.format(cmd), usage='%(prog)s', add_help=True)
         self.parser.add_argument('--workers', '-w', type=int, default=1, help='number of server instances')
         self.parser.add_argument('--config', '-c', required=True)
+        self.parser.add_argument('--http_port', '-p', type=int, default=None,
+                        help='server port for receiving HTTP requests')
         self.parser.add_argument('-device_map', type=int, nargs='+', default=[],
                                  help='specify the list of GPU device ids that will be used (id starts from 0). \
                         If num_worker > len(device_map), then device will be reused; \
@@ -84,6 +86,12 @@ class ServeCommand:
             worker = cmder.Worker(config, device_id=device_id)
             workers.append(worker)
             worker.start()
+        if self.args.http_port:
+            # self.logger.info('start http proxy')
+            proc_proxy = cmder.HTTPProxy(self.args)
+            workers.append(proc_proxy)
+            proc_proxy.start()    
+        
         for worker in workers:
             worker.is_ready.wait()
         queue = cmder.ServerQueue()

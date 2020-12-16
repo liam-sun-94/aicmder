@@ -77,7 +77,7 @@ class Worker(Process):
                     serving_args_dict = json.loads(serving_args)
                     print(serving_args, serving_args_dict)
                     frames[len(frames) - 1] = module[ModuleMethod](**serving_args_dict).encode()
-                    print("I: Normal reply", frames)
+                    print("I: Normal reply")
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS
                     

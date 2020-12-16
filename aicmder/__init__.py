@@ -15,6 +15,7 @@ from aicmder.module.module import serving, runnable
 
 # serving
 from aicmder.service.worker import Worker
+from aicmder.service.http_service import HTTPProxy
 from aicmder.service.server import ServerQueue
 
 
