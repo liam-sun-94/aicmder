@@ -1,0 +1,8 @@
+{
+    "albert": {
+        "name": "tests_model/AlbertModule",
+        "init_args": {
+            "dummpy_params": "dummpy"
+        }
+    }
+}

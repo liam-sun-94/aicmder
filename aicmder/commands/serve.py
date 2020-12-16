@@ -10,11 +10,13 @@ from pprint import pprint
 import json
 
 def is_json(config):
-  try:
-    json_object = json.loads(config)
-  except ValueError as e:
-    return False
-  return True
+    if config is None:
+        return False
+    try:
+        json_object = json.loads(config)
+    except ValueError as e:
+        return False
+    return True
 
 
 @register(name='{}.serve'.format(cmd), description='start all module')
@@ -24,7 +26,8 @@ class ServeCommand:
         self.parser = argparse.ArgumentParser(
             description=self.__class__.__doc__, prog='{} serve'.format(cmd), usage='%(prog)s', add_help=True)
         self.parser.add_argument('--workers', '-w', type=int, default=1, help='number of server instances')
-        self.parser.add_argument('--config', '-c', required=True)
+        self.parser.add_argument('--config', '-c', required=False)
+        self.parser.add_argument('--file', '-f', required=False)
         self.parser.add_argument('--http_port', '-p', type=int, default=None,
                         help='server port for receiving HTTP requests')
         self.parser.add_argument('-device_map', type=int, nargs='+', default=[],
@@ -78,8 +81,14 @@ class ServeCommand:
         self.num_worker = self.args.workers
         device_map = self._get_device_map()
         print(device_map)
-        assert is_json(self.args.config) == True
-        config = json.loads(self.args.config)
+        
+        assert is_json(self.args.config) == True or os.path.exists(self.args.file) == True
+        if os.path.exists(self.args.file):
+            with open(self.args.file, 'r') as f:
+                content = f.read()
+                config = json.loads(content)
+        else:
+            config = json.loads(self.args.config)
     
         workers = []
         for idx, device_id in enumerate(device_map):
