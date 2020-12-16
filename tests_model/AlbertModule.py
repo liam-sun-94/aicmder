@@ -3,11 +3,16 @@ from aicmder.module.module import serving, moduleinfo
 
 @moduleinfo(name='albert')
 class Albert(cmder.Module):
+    
+    def __init__(self, dummpy_params, **kwargs):
+        self.dummpy_params = dummpy_params
+    
     @serving
     def predict(self):
+        str = '123'
         import time
         time.sleep(1)
-        return 'hello world'
+        return 'hello world' + self.dummpy_params + ' {}'.format(str)
         
         
         

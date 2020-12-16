@@ -6,6 +6,9 @@ class ModuleDefine(Enum):
     
     ModuleName = 'name'
     ModuleMethod = 'serving_method'
+    ModuleParams = 'serving_args'
+    ModuleInitArgs = 'init_args'
+    
     def str(self):
         return self.value
     

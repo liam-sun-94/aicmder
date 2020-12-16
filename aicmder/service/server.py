@@ -68,7 +68,9 @@ class ServerQueue(Process):
                 # Use worker address for LRU routing
                 frames = backend.recv_multipart()
                 if not frames:
-                    break
+                    # can not break, waiting
+                    continue
+                    # break 
 
                 address = frames[0]
                 workers.ready(Worker(address))
@@ -91,7 +93,8 @@ class ServerQueue(Process):
             if socks.get(frontend) == zmq.POLLIN:
                 frames = frontend.recv_multipart()
                 if not frames:
-                    break
+                    # break
+                    continue
 
                 frames.insert(0, workers.next())
                 backend.send_multipart(frames)

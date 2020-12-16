@@ -19,6 +19,8 @@ def worker_socket(context, poller):
 
 ModuleName = cmder.ModuleDefine.ModuleName.str()
 ModuleMethod = cmder.ModuleDefine.ModuleMethod.str()
+ModuleInitArgs = cmder.ModuleDefine.ModuleInitArgs.str()
+ModuleParams = cmder.ModuleDefine.ModuleParams.str()
 class Worker(Process):
     
     
@@ -33,13 +35,15 @@ class Worker(Process):
         for module_name, module_info in self.module_infos.items():
             print(module_name, module_info)
             
-            init_args = module_info.get('init_args', {})
+            init_args = module_info.get(ModuleInitArgs, {})
             init_args.update({ModuleName: module_info[ModuleName]})
+            init_args.update(module_info[ModuleInitArgs])
+            
             module = cmder.Module(**init_args)
             method_name = module.serving_func_name
             serving_method = getattr(module, method_name)
-            print(serving_method)
-            self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
+            serving_args = module_info.get(ModuleParams, {})
+            self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method, ModuleParams: serving_args}
         print(self.serving_methods)
         
     def run(self):    
@@ -65,7 +69,10 @@ class Worker(Process):
                     break # Interrupted
 
                 if len(frames) == 3:
-                    frames[len(frames) - 1] = self.serving_methods['albert'][ModuleMethod]().encode()
+                    module = self.serving_methods['albert']
+                    serving_args = module[ModuleParams]
+                    
+                    frames[len(frames) - 1] = module[ModuleMethod](**serving_args).encode()
                     print("I: Normal reply", frames)
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS

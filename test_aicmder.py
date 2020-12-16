@@ -1,6 +1,6 @@
 import unittest
 import aicmder as cmder
-
+import time
 
 class TestCommands(unittest.TestCase):
 
@@ -31,17 +31,27 @@ class TestCommands(unittest.TestCase):
 
 
 def test_worker():
+    predict_params = {'str': '123'}
     worker = cmder.Worker(
-        {'albert': {'name': 'tests_model/AlbertModule'}})
+        {'albert': {'name': 'tests_model/AlbertModule', 'serving_args': predict_params, 'init_args': {'dummpy_params': 'dummpy'}}})
     worker.start()
     queue = cmder.ServerQueue()
     queue.start()
-    
+    queue.join()
+    worker.join()
+
 
 def test_PPworker():
     worker = cmder.PPworker()
     worker.start()
     
+def test_func(*args, **kwargs):
+    print(args, *args)
+    print(kwargs)
+
+
 if __name__ == "__main__":
-    test_worker()
+    d = {'c': 123, 'd': 123}
+    test_func({'a': 123, 'b': 123}, **d)
+    # test_worker()
     # unittest.main()

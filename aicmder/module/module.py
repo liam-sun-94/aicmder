@@ -31,6 +31,10 @@ def serving(func: Callable) -> Callable:
     _module_serving_func[mod] = func.__name__
 
     def _wrapper(*args, **kwargs):
+        func_signature = inspect.signature(func)
+        if len(func_signature.parameters) <= 1:
+            print(args, kwargs)
+            return func(*args)
         return func(*args, **kwargs)
 
     return _wrapper
@@ -58,6 +62,9 @@ class Module(object):
                                is specified. Default to False.
         branch(str|optional): The branch of the specified git repository. Default to None.
     '''
+
+    def __init__(self, **kwargs) -> None:
+        pass
 
     def __new__(cls,
                 *,
