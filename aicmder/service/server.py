@@ -1,4 +1,4 @@
-from multiprocessing import Process
+from multiprocessing import Process, Event
 from collections import OrderedDict
 import time
 from aicmder.service.PPpolicy import *
@@ -37,6 +37,10 @@ class WorkerQueue(object):
 
 class ServerQueue(Process):
     
+    def __init__(self):
+        super(ServerQueue, self).__init__()
+        self.is_ready = Event()
+    
     def run(self):
         context = zmq.Context(1)
 
@@ -53,7 +57,7 @@ class ServerQueue(Process):
         poll_both.register(backend, zmq.POLLIN)
 
         workers = WorkerQueue()
-
+        self.is_ready.set()
         heartbeat_at = time.time() + HEARTBEAT_INTERVAL
 
         while True:

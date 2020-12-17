@@ -6,8 +6,8 @@ from termcolor import colored
 import json
 # from .helper import set_logger
 
-# 3s for timeout
-REQUEST_TIMEOUT = 3000  # 2500
+# 8s for timeout
+REQUEST_TIMEOUT = 8000  
 REQUEST_RETRIES = 3
 SERVER_ENDPOINT = "tcp://localhost:5555"
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -71,8 +71,7 @@ class BCManager():
 
 class ConcurrentClient:
 
-    def __init__(self) -> None:
-        max_concurrency = 500
+    def __init__(self, max_concurrency = 500) -> None:
         self.max_concurrency = max_concurrency
         self.available_bc = [Client() for _ in range(max_concurrency)]
         
@@ -128,6 +127,6 @@ class HTTPProxy(Process):
     def run(self):
         import uvicorn
         app = self.create_fastapi_app()
-        self.concurrent = ConcurrentClient()
+        self.concurrent = ConcurrentClient(max_concurrency = self.args.max_connect)
         self.is_ready.set()
         uvicorn.run(app, host="0.0.0.0", port=self.args.http_port)

@@ -15,18 +15,18 @@ aicmder onnx -s aaaa -m /Users/faith/AI_Commander/model/edsr.py -c /Users/faith/
 
 > aicmder onnx -s output_dir -m './model/edsr.py' -c '/Users/faith/AI_Commander/edsr_baseline_x4-6b446fab.pt'
 
-> aicmder serve -w 4 -p 8080 -f tests_model/conf.json -device_map 0
+> aicmder serve -w 4 -p 8080 -f tests_model/conf.json --device_map 0 --max_connect 700
 > aicmder serve -w 4 -p 8080 -f tests_model/conf.json 
 
 ## abtest
 
 ab -c 500 -t 30 -T 'application/json'  -p post.txt 127.0.0.1:8080/predict
-ab -c 500 -t 30 -T 'application/json'  -p post.txt 10.11.32.52:7080/predict
+ab -c 500 -t 30 -T 'application/json'  -p post.txt 192.168.2.156:8080/predict
 
 ## curl 
 
 curl 127.0.0.1:8080/predict -X POST -d '{"str": "123"}'
-curl 10.11.32.52/predict -X POST -d '{"str": "123"}'
+
 
 1. if error `socket: Too many open files (24)` happened, try `ulimit -n 9000`
 

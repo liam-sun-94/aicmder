@@ -1,6 +1,15 @@
+from multiprocessing.context import Process
 import unittest
 import aicmder as cmder
 import time, json 
+
+class MyProcess(Process):
+    
+    def run(self) -> None:
+        import time
+        while True:
+            print('hello')
+            time.sleep(1)
 class TestCommands(unittest.TestCase):
 
     def test_worker(self):
@@ -8,6 +17,10 @@ class TestCommands(unittest.TestCase):
             {'albert': {'name': 'tests_model/AlbertModule'}})
         worker.start()
 
+    # def test_process(self):
+    #     worker = MyProcess()
+    #     worker.start()
+        
     # def test_help(self):
     #     print(cmder)
     #     help = cmder.help.HelpCommand()
@@ -62,7 +75,11 @@ def test_serving():
     print(cmder)
     config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
     serve = cmder.serve.ServeCommand()
-    serve.execute(['-w', '5', '-c', json.dumps(config), '-p', '8080'])
+    serve.execute(['-w', '5', '-c', json.dumps(config), '-p', '8080', '--max_connect', '10'])
+
+def test_process():
+    worker = MyProcess()
+    worker.start()
 
 if __name__ == "__main__":
     # d = {'c': 123, 'd': 123}
@@ -70,4 +87,5 @@ if __name__ == "__main__":
     # test_worker()
     # test_albert()
     # unittest.main()
+    # test_process()
     test_serving()

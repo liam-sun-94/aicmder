@@ -1,12 +1,12 @@
-from multiprocessing import Process
-import multiprocessing
+# from multiprocessing import Process
+# import multiprocessing
 import aicmder as cmder
 import json
 from aicmder.service.PPpolicy import *
 from random import randint
 import time
 import zmq
-import datetime, json
+import datetime, json, sys, os
 def worker_socket(context, poller):
     """Helper function that returns a new configured socket
        connected to the Paranoid Pirate queue"""
@@ -23,12 +23,15 @@ ModuleMethod = cmder.ModuleDefine.ModuleMethod.str()
 ModuleInitArgs = cmder.ModuleDefine.ModuleInitArgs.str()
 ModuleParams = cmder.ModuleDefine.ModuleParams.str()
 DeviceId = cmder.ModuleDefine.DeviceId.str()
-class Worker(Process):
+class Worker:
     
     
-    def __init__(self, module_infos, device_id='cpu', **kwargs):
+    def __init__(self, module_infos, device_id=-1, **kwargs):
         super(Worker, self).__init__()
-        self.module_infos = json.loads(module_infos) if type(module_infos) == str else module_infos
+        if type(module_infos) == dict:
+            self.module_infos = module_infos
+        else:
+            self.module_infos = json.loads(module_infos) if type(module_infos) == str else module_infos
         self.device_id = device_id
         self.kwargs = kwargs
         assert len(self.module_infos) > 0
@@ -46,7 +49,7 @@ class Worker(Process):
             serving_method = getattr(module, method_name)
             # serving_args = module_info.get(ModuleParams, {})
             self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
-        self.is_ready = multiprocessing.Event()
+        # self.is_ready = multiprocessing.Event()
         
         
     def run(self):    
@@ -55,9 +58,9 @@ class Worker(Process):
 
         liveness = HEARTBEAT_LIVENESS
         interval = INTERVAL_INIT
-        self.is_ready.set()
+        # self.is_ready.set()
         heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-
+        print("{} is ready!".format(os.getpid()))
         worker = worker_socket(context, poller)
         while True:
             socks = dict(poller.poll(HEARTBEAT_INTERVAL * 1000))
@@ -75,7 +78,7 @@ class Worker(Process):
                     module = self.serving_methods['albert']
                     serving_args = frames[len(frames) - 1].decode()
                     serving_args_dict = json.loads(serving_args)
-                    print(serving_args, serving_args_dict)
+
                     frames[len(frames) - 1] = module[ModuleMethod](**serving_args_dict).encode()
                     print("I: Normal reply")
                     worker.send_multipart(frames)
@@ -105,3 +108,12 @@ class Worker(Process):
                 heartbeat_at = time.time() + HEARTBEAT_INTERVAL
                 # print("I: Worker heartbeat", datetime.datetime.now())
                 worker.send(PPP_HEARTBEAT)
+                
+if __name__ == "__main__":
+    # config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
+    argv = sys.argv
+    assert len(argv) >= 3
+    config = json.loads(argv[1])
+    device_id = int(argv[2])
+    worker = Worker(config, device_id)
+    worker.run()

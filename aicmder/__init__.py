@@ -1,7 +1,7 @@
 # coding:utf-8
 import sys
 
-__version__ = '0.1.6'
+__version__ = '0.2.3'
 
 # from aicmder.utils import utils
 # sys.modules['aicmder.common.utils'] = utils

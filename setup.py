@@ -69,7 +69,9 @@ setup(
         'GPUtil>=1.3.0',
         'torch',
         'onnx',
-        'onnx_tf'
+        'onnx_tf',
+        'pickle5',
+        'packaging'
     ],
     extras_require={
         'http': ['fastapi', 'flask-json', 'uvicorn']

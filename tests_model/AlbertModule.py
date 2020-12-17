@@ -10,6 +10,7 @@ class Albert(cmder.Module):
     def __init__(self, dummpy_params, **kwargs):
         self.dummpy_params = dummpy_params
         self.pretrained = '/Users/faith/jx3cloud_QA/rasa_action/models/ALBERT'
+        # self.pretrained = '/smb/AI_models/transformer/ALBERT/'
         self.device = int(kwargs['device_id'])
         self.device = "cuda:{}".format(self.device) if self.device >= 0 else "cpu"
 
