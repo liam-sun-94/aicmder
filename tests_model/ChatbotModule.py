@@ -5,6 +5,7 @@ import random
 import os
 import numpy as np
 import torch
+import sqlite3
 
 class QA:
     question_type = ''
@@ -41,8 +42,21 @@ class QASet:
         return self.default_answers[index]
 
     def get_answer(self, question: str):
-        ans = self.qa_object.get(question, None)
-        return ans.answer if ans is not None else self.choose_default_ans()
+        qa = self.qa_object.get(question, None)
+        if qa.question_type in ['查学校', '查小区', '学校评价']:
+            conn = sqlite3.connect('/Users/faith/wechat_admin/db.sqlite3')
+            c = conn.cursor()
+            c.execute(qa.answer)
+            ret = c.fetchall()
+            conn.close()
+            # print(ret)
+            result = ""
+            for r in ret:
+                result += ','.join(r) + ' '
+            result = result.strip()
+            return self.choose_default_ans() if result == '' else result
+            
+        return qa.answer if qa is not None else self.choose_default_ans()
 
     def add_embedding(self, embed):
         self.questions_embeds.append(embed)

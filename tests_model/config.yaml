@@ -13,15 +13,15 @@ chatbot:
       - 你的学历
       - 你的教育等级
   查学校:
-    八中:
-      - 柠溪的学区房
-      - 香洲的学区房
-  wechat_school:
-    第八中学:
+    select ws.name, c.name  from wechat_communitytoschool s, wechat_community c, wechat_school ws where c.name like '福宁花园' and s.communityId_id = c.communityId and ws.schoolId = s.schoolId:
+      - 福宁花园的学区房
+      
+  学校评价:
+    select description from wechat_school where name = '第八中学':
       - 八中怎么样
       - 八中如何
   查小区:
-    福宁花园:
+    SELECT name from wechat_community where communityId in (SELECT communityId_id from wechat_communitytoschool where schoolId in ( SELECT schoolId from wechat_school where name = '第八中学' )):
       - 八中的学区房
     
 
