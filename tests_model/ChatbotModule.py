@@ -47,7 +47,9 @@ class QASet:
             return 2
         if qa.question_type in ['查学校']:
             return 5
-        return 3
+        if qa.question_type in ['学校评价']:
+            return 3
+        return 1
 
     def get_answer(self, question: str):
         qa = self.qa_object.get(question, None)
@@ -127,6 +129,8 @@ class Chatbot(Albert):
             k = self.qa_set.get_k(questions[0])
             questions = questions[:k]
             ret = ''
+            if k == 1:
+                return self.qa_set.get_answer(questions[0])
             for i, q in enumerate(questions):
                 ret += '问题: {}'.format(q) + os.linesep
                 ret += '{}. '.format(i + 1) + self.qa_set.get_answer(q) + os.linesep
