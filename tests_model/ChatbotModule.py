@@ -6,7 +6,7 @@ import os
 import numpy as np
 import torch
 import sqlite3
-
+import cn2an
 class QA:
     question_type = ''
     question = ''
@@ -40,6 +40,14 @@ class QASet:
         count = len(self.default_answers)
         index = random.randint(0, count - 1)
         return self.default_answers[index]
+    
+    def get_k(self, question: str):
+        qa = self.qa_object.get(question, None)
+        if qa.question_type in ['查小区']:
+            return 2
+        if qa.question_type in ['查学校']:
+            return 5
+        return 3
 
     def get_answer(self, question: str):
         qa = self.qa_object.get(question, None)
@@ -105,6 +113,7 @@ class Chatbot(Albert):
     @serving
     def chat(self, question):
         self.init_embedding()
+        question = cn2an.transform(question, "an2cn")
         embed = self.evaluate(question)
         embed_tensor = torch.tensor(embed)
 
@@ -113,11 +122,14 @@ class Chatbot(Albert):
         # print(question, similarity)
         if torch.max(similarity) > self._threadhold:
             # question = self.qa_set.questions[torch.argmax(similarity)]
-            k = 3
+            k = 10
             questions = np.array(self.qa_set.questions)[torch.topk(similarity, k)[1]]
+            k = self.qa_set.get_k(questions[0])
+            questions = questions[:k]
             ret = ''
-            for q in questions:
-                ret += self.qa_set.get_answer(q) + ' '
+            for i, q in enumerate(questions):
+                ret += '问题: {}'.format(q) + os.linesep
+                ret += '{}. '.format(i + 1) + self.qa_set.get_answer(q) + os.linesep
             return ret
         else:
             return self.qa_set.choose_default_ans()
