@@ -3,6 +3,7 @@ import unittest
 import aicmder as cmder
 import time, json 
 from termcolor import colored
+import sqlite3
 class MyProcess(Process):
     
     def run(self) -> None:
@@ -102,6 +103,33 @@ def test_execute():
     from aicmder.commands.utils import execute
     execute()
 
+def test_write_community():
+    conn = sqlite3.connect('/Users/faith/wechat_admin/db.sqlite3')
+    c = conn.cursor()
+    # 'select name from wechat_community'
+    sql = 'select name from wechat_school'
+    c.execute(sql)
+    
+    ret = c.fetchall()
+    conn.close()
+    print(len(ret), type(ret))
+    communiy = set(ret)
+    print(len(communiy))
+    
+    with open('c.txt', 'w+') as f:
+        for commu in communiy:
+            c = commu[0]
+    #         s = '''    select ws.name, c.name  from wechat_communitytoschool s, wechat_community c, wechat_school ws where c.name like '{}' and s.communityId_id = c.communityId and ws.schoolId = s.schoolId:
+    #   - {}的学区房\n'''.format(c, c)
+    #         s = '''    select description from wechat_school where name = '{}':
+    #   - {}怎么样
+    #   - {}如何\n'''.format(c,c,c)
+            s = '''    SELECT name from wechat_community where communityId in (SELECT communityId_id from wechat_communitytoschool where schoolId in ( SELECT schoolId from wechat_school where name = '{}' )):
+      - {}的学区房\n'''.format(c, c)
+            f.writelines(s)
+            
+    
+        
 if __name__ == "__main__":
     # d = {'c': 123, 'd': 123}
     # test_func({'a': 123, 'b': 123}, **d)
@@ -111,4 +139,5 @@ if __name__ == "__main__":
     # test_process()
     # test_serving()
     test_chatbot()
+    # test_write_community()
     # test_execute()

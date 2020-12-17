@@ -68,7 +68,7 @@ class Chatbot(Albert):
 
     def load_config(self, file_path):
         d = read_yaml_file(file_path)
-        print(d)
+        # print(d)
         self.qa_set = QASet(d.get('default'))
         for qa_type in d['chatbot'].items():
             question_type = qa_type[0]
@@ -92,10 +92,15 @@ class Chatbot(Albert):
 
     def init_embedding(self):
         if self.is_init == False:
-            for q in self.qa_set.questions:
-                self.qa_set.add_embedding(self.evaluate(q))
-            self.all_embed_tensor = torch.squeeze(torch.tensor(self.qa_set.questions_embeds))
+            if os.path.exists('embeds.pt'):
+                self.all_embed_tensor = torch.load('embeds.pt')
+            else:
+                for q in self.qa_set.questions:
+                    self.qa_set.add_embedding(self.evaluate(q))
+                self.all_embed_tensor = torch.squeeze(torch.tensor(self.qa_set.questions_embeds))
+                torch.save(self.all_embed_tensor, 'embeds.pt')
             self.is_init = True
+            print('init emdbeding success!')
             
     @serving
     def chat(self, question):
@@ -107,8 +112,13 @@ class Chatbot(Albert):
         # print(self.qa_set.questions) 
         # print(question, similarity)
         if torch.max(similarity) > self._threadhold:
-            question = self.qa_set.questions[torch.argmax(similarity)]
-            return self.qa_set.get_answer(question)
+            # question = self.qa_set.questions[torch.argmax(similarity)]
+            k = 3
+            questions = np.array(self.qa_set.questions)[torch.topk(similarity, k)[1]]
+            ret = ''
+            for q in questions:
+                ret += self.qa_set.get_answer(q) + ' '
+            return ret
         else:
             return self.qa_set.choose_default_ans()
     
