@@ -115,7 +115,7 @@ class HTTPProxy(Process):
         def predict(data: dict, request: Request):
             # data = request.form if request.form else request.json
             try:
-                print(request, data)
+                logging.debug(request, data)
                 json_str = json.dumps(data)
                 # logger.info('new request from %s' % request.client.host)
                 result = self.concurrent.send_request(json_str.encode())
