@@ -12,3 +12,4 @@ try:
 except:
     pass
 import aicmder.commands.serve
+import aicmder.commands.stop

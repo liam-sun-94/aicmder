@@ -12,10 +12,15 @@ class MyProcess(Process):
             time.sleep(1)
 class TestCommands(unittest.TestCase):
 
-    def test_worker(self):
-        worker = cmder.Worker(
-            {'albert': {'name': 'tests_model/AlbertModule'}})
-        worker.start()
+    # def test_worker(self):
+    #     worker = cmder.Worker(
+    #         {'albert': {'name': 'tests_model/AlbertModule'}})
+    #     worker.start()
+    
+    def test_stop(self):
+        print(cmder)
+        stop = cmder.stop.StopCommand()
+        stop.execute([])
 
     # def test_process(self):
     #     worker = MyProcess()
@@ -81,11 +86,16 @@ def test_process():
     worker = MyProcess()
     worker.start()
 
+def test_execute():
+    from aicmder.commands.utils import execute
+    execute()
+
 if __name__ == "__main__":
     # d = {'c': 123, 'd': 123}
     # test_func({'a': 123, 'b': 123}, **d)
     # test_worker()
     # test_albert()
-    # unittest.main()
+    unittest.main()
     # test_process()
-    test_serving()
+    # test_serving()
+    # test_execute()
