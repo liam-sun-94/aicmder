@@ -15,7 +15,9 @@ class Albert(cmder.Module):
         self.device = "cuda:{}".format(self.device) if self.device >= 0 else "cpu"
 
         print('Albert', self.device)
-        self.bert = None
+        self.bert = AlbertModel.from_pretrained(self.pretrained, output_attentions=False, output_hidden_states=True)
+        self.bert.to(self.device)
+        self.bert.eval()
         self.tokenizer = BertTokenizer.from_pretrained(self.pretrained)
         
     def evaluate(self, inputtext):
@@ -43,10 +45,6 @@ class Albert(cmder.Module):
     
     @serving
     def predict(self, str):
-        if self.bert is None:
-            self.bert = AlbertModel.from_pretrained(self.pretrained, output_attentions=False, output_hidden_states=True)
-            self.bert.to(self.device)
-            self.bert.eval()
         print('begin predict', str)
         result = self.evaluate(str)
         return json.dumps(result)
