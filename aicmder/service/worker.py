@@ -7,6 +7,9 @@ from random import randint
 import time
 import zmq
 import datetime, json, sys, os
+from termcolor import colored
+
+
 def worker_socket(context, poller):
     """Helper function that returns a new configured socket
        connected to the Paranoid Pirate queue"""
@@ -26,7 +29,7 @@ DeviceId = cmder.ModuleDefine.DeviceId.str()
 class Worker:
     
     
-    def __init__(self, module_infos, device_id=-1, **kwargs):
+    def __init__(self, module_infos, logger, device_id=-1, **kwargs):
         super(Worker, self).__init__()
         if type(module_infos) == dict:
             self.module_infos = module_infos
@@ -34,11 +37,13 @@ class Worker:
             self.module_infos = json.loads(module_infos) if type(module_infos) == str else module_infos
         self.device_id = device_id
         self.kwargs = kwargs
+        
         assert len(self.module_infos) > 0
         self.serving_methods = {}
+        self.logger = logger
 
         for module_name, module_info in self.module_infos.items():
-            print(module_name, module_info)
+            self.logger.info(module_name, module_info)
             
             init_args = module_info.get(ModuleInitArgs, {})
             init_args.update({ModuleName: module_info[ModuleName], DeviceId: self.device_id})
@@ -60,7 +65,7 @@ class Worker:
         interval = INTERVAL_INIT
         # self.is_ready.set()
         heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-        print("{} is ready!".format(os.getpid()))
+        self.logger.info("worker is ready!")
         worker = worker_socket(context, poller)
         while True:
             socks = dict(poller.poll(HEARTBEAT_INTERVAL * 1000))
@@ -80,21 +85,21 @@ class Worker:
                     serving_args_dict = json.loads(serving_args)
 
                     frames[len(frames) - 1] = module[ModuleMethod](**serving_args_dict).encode()
-                    print("I: Normal reply")
+                    self.logger.debug("I: Normal reply")
                     worker.send_multipart(frames)
                     liveness = HEARTBEAT_LIVENESS
                     
                 elif len(frames) == 1 and frames[0] == PPP_HEARTBEAT:
-                    # print("I: Queue heartbeat", datetime.datetime.now())
+                    # self.logger.debug("I: Queue heartbeat", datetime.datetime.now())
                     liveness = HEARTBEAT_LIVENESS
                 else:
-                    print("E: Invalid message: %s" % frames)
+                    self.logger.debug("E: Invalid message: %s" % frames)
                 interval = INTERVAL_INIT
             else:
                 liveness -= 1
                 if liveness == 0:
-                    print("W: Heartbeat failure, can't reach queue")
-                    print("W: Reconnecting in %0.2fs..." % interval)
+                    self.logger.info("W: Heartbeat failure, can't reach queue")
+                    self.logger.info("W: Reconnecting in %0.2fs..." % interval)
                     time.sleep(interval)
 
                     if interval < INTERVAL_MAX:
@@ -106,7 +111,7 @@ class Worker:
                     liveness = HEARTBEAT_LIVENESS
             if time.time() > heartbeat_at:
                 heartbeat_at = time.time() + HEARTBEAT_INTERVAL
-                # print("I: Worker heartbeat", datetime.datetime.now())
+                # self.logger.debug("I: Worker heartbeat", datetime.datetime.now())
                 worker.send(PPP_HEARTBEAT)
                 
 if __name__ == "__main__":
@@ -114,6 +119,11 @@ if __name__ == "__main__":
     argv = sys.argv
     assert len(argv) >= 3
     config = json.loads(argv[1])
-    device_id = int(argv[2])
-    worker = Worker(config, device_id)
+    device_id = int(argv[2])    
+    
+    worker_id = os.getpid()
+    verbose = cmder.Common.LOG_VERBOSE
+    logger = cmder.Common.set_logger(colored('WORKER-%d' % worker_id, 'yellow'), verbose)
+        
+    worker = Worker(config, logger, device_id = device_id)
     worker.run()

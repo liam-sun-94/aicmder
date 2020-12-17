@@ -75,7 +75,7 @@ def test_serving():
     print(cmder)
     config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
     serve = cmder.serve.ServeCommand()
-    serve.execute(['-w', '5', '-c', json.dumps(config), '-p', '8080', '--max_connect', '10'])
+    serve.execute(['-w', '2', '-c', json.dumps(config), '-p', '8080', '--max_connect', '10'])
 
 def test_process():
     worker = MyProcess()

@@ -3,8 +3,11 @@ from collections import OrderedDict
 import time
 from aicmder.service.PPpolicy import *
 import zmq
-import datetime
+from aicmder.common import set_logger, LOG_VERBOSE
+from termcolor import colored
 
+verbose = LOG_VERBOSE
+logger = set_logger(colored('SERVER_QUEUE', 'magenta'), verbose)
 class Worker(object):
     def __init__(self, address):
         self.address = address
@@ -15,7 +18,7 @@ class WorkerQueue(object):
         self.queue = OrderedDict()
 
     def ready(self, worker):
-        # print('I: worker: {} ready, the address is {}'.format(worker, worker.address), datetime.datetime.now())
+        logger.debug('I: worker: {} ready, the address is {}'.format(worker, worker.address))
         self.queue.pop(worker.address, None)
         self.queue[worker.address] = worker
 
@@ -28,7 +31,7 @@ class WorkerQueue(object):
                 expired.append(address)
         for address in expired:
             self.queue.pop(address, None)
-            print("W: Idle worker expired: {}, remaining worker: {}".format(address, len(self.queue)), datetime.datetime.now())
+            logger.info("W: Idle worker expired: {}, remaining worker: {}".format(address, len(self.queue)))
 
     def next(self):
         address, worker = self.queue.popitem(False)
@@ -83,9 +86,9 @@ class ServerQueue(Process):
                 msg = frames[1:]
                 if len(msg) == 1:
                     if msg[0] not in (PPP_READY, PPP_HEARTBEAT):
-                        print("E: Invalid message from worker: %s" % msg)
+                        logger.info("E: Invalid message from worker: %s" % msg)
                 else:
-                    # print("I: Sending message to client: %s" % msg)
+                    logger.debug("I: Sending message to client: %s" % msg)
                     frontend.send_multipart(msg)
 
                 # Send heartbeats to idle workers if it's time

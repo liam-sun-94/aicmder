@@ -1,7 +1,7 @@
 # coding:utf-8
 import sys
 
-__version__ = '0.2.3'
+__version__ = '0.2.6'
 
 # from aicmder.utils import utils
 # sys.modules['aicmder.common.utils'] = utils
@@ -21,5 +21,5 @@ from aicmder.service.server import ServerQueue
 
 from aicmder.service.PPworker import PPworker
 
-# util
-# from aicmder.utils.utils import *
+# common
+import aicmder.common as Common

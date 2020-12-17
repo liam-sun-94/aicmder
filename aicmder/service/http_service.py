@@ -5,12 +5,15 @@ import sys
 from termcolor import colored
 import json
 # from .helper import set_logger
+from aicmder.common import set_logger, LOG_VERBOSE
 
 # 8s for timeout
 REQUEST_TIMEOUT = 8000  
 REQUEST_RETRIES = 3
 SERVER_ENDPOINT = "tcp://localhost:5555"
-logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+
+verbose = LOG_VERBOSE
+logging = set_logger(colored('SERVER_QUEUE', 'magenta'), verbose)
 
 
 class Client:
