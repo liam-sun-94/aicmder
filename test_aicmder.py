@@ -2,7 +2,7 @@ from multiprocessing.context import Process
 import unittest
 import aicmder as cmder
 import time, json 
-
+from termcolor import colored
 class MyProcess(Process):
     
     def run(self) -> None:
@@ -50,9 +50,10 @@ class TestCommands(unittest.TestCase):
 def test_worker():
     workers = []
     config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
-    device_map = ["cpu" for i in range(5)]
+    device_map = ["cpu" for i in range(2)]
+    logger = cmder.Common.set_logger(colored('WORKER-%d' % 1, 'yellow'), True)
     for idx, device_id in enumerate(device_map):
-        worker = cmder.Worker(config, device_id=device_id)
+        worker = cmder.Worker(config, logger, device_id=device_id)
         workers.append(worker)
         worker.start()
     for worker in workers:
@@ -62,6 +63,11 @@ def test_worker():
     queue.join()
     
 
+def test_single_worker():
+    config = {'chatbot': {'name': 'tests_model/ChatbotModule', 'init_args': {'file_path': '/Users/faith/AI_Commander/tests_model/config.yaml'}}}
+    logger = cmder.Common.set_logger(colored('WORKER-%d' % 1, 'yellow'), True)
+    worker = cmder.Worker(config, logger, device_id=-1)
+    worker.run()
 
 def test_PPworker():
     worker = cmder.PPworker()
@@ -81,6 +87,12 @@ def test_serving():
     config = {'albert': {'name': 'tests_model/AlbertModule', 'init_args': {'dummpy_params': 'dummpy'}}}
     serve = cmder.serve.ServeCommand()
     serve.execute(['-w', '2', '-c', json.dumps(config), '-p', '8080', '--max_connect', '10'])
+    
+def test_chatbot():
+    print(cmder)
+    config = {'chatbot': {'name': 'tests_model/ChatbotModule', 'init_args': {'file_path': '/Users/faith/AI_Commander/tests_model/config.yaml'}}}
+    serve = cmder.serve.ServeCommand()
+    serve.execute(['-w', '1', '-c', json.dumps(config), '-p', '8080', '--max_connect', '10'])
 
 def test_process():
     worker = MyProcess()
@@ -93,9 +105,10 @@ def test_execute():
 if __name__ == "__main__":
     # d = {'c': 123, 'd': 123}
     # test_func({'a': 123, 'b': 123}, **d)
-    # test_worker()
+    # test_single_worker()
     # test_albert()
     # unittest.main()
     # test_process()
-    test_serving()
+    # test_serving()
+    test_chatbot()
     # test_execute()

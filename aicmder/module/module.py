@@ -124,7 +124,7 @@ class Module(object):
 
         for _item, _cls in inspect.getmembers(py_module, inspect.isclass):
             _item = py_module.__dict__[_item]
-            if hasattr(_item, '_hook_by_cmder') and issubclass(_item, Module):
+            if hasattr(_item, '_hook_by_cmder') and issubclass(_item, Module) and _item.__module__ in directory:
                 user_module_cls = _item
                 break
         else:

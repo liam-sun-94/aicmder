@@ -26,6 +26,7 @@ ab -c 500 -t 30 -T 'application/json'  -p post.txt 192.168.2.156:8080/predict
 ## curl 
 
 curl 127.0.0.1:8080/predict -X POST -d '{"str": "123"}'
+curl 127.0.0.1:8080/predict -X POST -d '{"question": "你是谁"}'
 
 
 1. if error `socket: Too many open files (24)` happened, try `ulimit -n 9000`

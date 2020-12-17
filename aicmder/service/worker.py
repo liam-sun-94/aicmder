@@ -54,6 +54,8 @@ class Worker:
             serving_method = getattr(module, method_name)
             # serving_args = module_info.get(ModuleParams, {})
             self.serving_methods[module_name] = {ModuleName: module_info[ModuleName], ModuleMethod: serving_method}
+            self.module_name = module_name
+        # print(self.serving_methods)
         # self.is_ready = multiprocessing.Event()
         
         
@@ -80,7 +82,7 @@ class Worker:
                     break # Interrupted
 
                 if len(frames) == 3:
-                    module = self.serving_methods['albert']
+                    module = self.serving_methods[self.module_name]
                     serving_args = frames[len(frames) - 1].decode()
                     serving_args_dict = json.loads(serving_args)
 

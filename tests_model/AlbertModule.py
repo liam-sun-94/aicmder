@@ -4,11 +4,12 @@ from transformers import *
 import torch
 import json
 import numpy as np
+# from tests_model.ChatbotModule import Chatbot
 @moduleinfo(name='albert')
 class Albert(cmder.Module):
     
-    def __init__(self, dummpy_params, **kwargs):
-        self.dummpy_params = dummpy_params
+    def __init__(self, **kwargs):
+        # self.dummpy_params = dummpy_params
         self.pretrained = '/Users/faith/jx3cloud_QA/rasa_action/models/ALBERT'
         # self.pretrained = '/smb/AI_models/transformer/ALBERT/'
         self.device = int(kwargs['device_id'])
