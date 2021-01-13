@@ -91,7 +91,7 @@ def test_serving():
     
 def test_chatbot():
     print(cmder)
-    config = {'chatbot': {'name': 'tests_model/ChatbotModule', 'init_args': {'file_path': '/Users/faith/AI_Commander/tests_model/config.yaml'}}}
+    config = {'chatbot': {'name': 'tests_model/ChatbotModule', 'init_args': {'file_path': './tests_model/config.yaml'}}}
     serve = cmder.serve.ServeCommand()
     serve.execute(['-w', '1', '-c', json.dumps(config), '-p', '8080', '--max_connect', '5'])
 
