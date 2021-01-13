@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/opt/anaconda3/envs/xsj/bin/python"
+    // "python.pythonPath": "/opt/anaconda3/envs/xsj/bin/python"
+    "python.pythonPath": "/home/faith/miniconda3/envs/torch/bin/python"
 }
