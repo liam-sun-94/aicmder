@@ -7,6 +7,11 @@ import numpy as np
 import torch
 import sqlite3
 import cn2an
+dir_path = os.path.dirname(os.path.realpath(__file__))
+db_file = os.path.join(dir_path, 'db.sqlite3')
+print(db_file)
+assert os.path.exists(db_file) == True
+
 class QA:
     question_type = ''
     question = ''
@@ -54,8 +59,9 @@ class QASet:
     def get_answer(self, question: str):
         qa = self.qa_object.get(question, None)
         if qa.question_type in ['查学校', '查小区', '学校评价']:
-            conn = sqlite3.connect('/Users/faith/wechat_admin/db.sqlite3')
+            conn = sqlite3.connect(db_file)
             c = conn.cursor()
+            print(qa.answer)
             c.execute(qa.answer)
             ret = c.fetchall()
             conn.close()
