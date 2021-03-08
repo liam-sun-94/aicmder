@@ -119,6 +119,10 @@ class HTTPProxy(Process):
                 json_str = json.dumps(data)
                 # logger.info('new request from %s' % request.client.host)
                 result = self.concurrent.send_request(json_str.encode())
+
+                if type(result) == bytes:
+                    result = json.loads(result.decode('utf-8'))
+                    return result
                 return result
             except Exception as e:
                 print(e)

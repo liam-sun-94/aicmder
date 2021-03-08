@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import sqlite3
 import cn2an
+import json
 dir_path = os.path.dirname(os.path.realpath(__file__))
 db_file = os.path.join(dir_path, 'db.sqlite3')
 print(db_file)
@@ -128,21 +129,24 @@ class Chatbot(Albert):
         similarity = torch.nn.functional.cosine_similarity(embed_tensor, self.all_embed_tensor, dim=1, eps=1e-8) 
         # print(self.qa_set.questions) 
         # print(question, similarity)
+        ret = []
         if torch.max(similarity) > self._threadhold:
             # question = self.qa_set.questions[torch.argmax(similarity)]
             k = 10
             questions = np.array(self.qa_set.questions)[torch.topk(similarity, k)[1]]
             k = self.qa_set.get_k(questions[0])
             questions = questions[:k]
-            ret = ''
             if k == 1:
-                return self.qa_set.get_answer(questions[0])
-            for i, q in enumerate(questions):
-                ret += '问题: {}'.format(q) + os.linesep
-                ret += '{}. '.format(i + 1) + self.qa_set.get_answer(q) + os.linesep
-            return ret
+                ret.append(self.qa_set.get_answer(questions[0]))
+            else:
+                for i, q in enumerate(questions):
+                    question = '问题: {}'.format(q)
+                    ans = self.qa_set.get_answer(q)
+                    ret.append({question: ans})
         else:
-            return self.qa_set.choose_default_ans()
+            ret.append(self.qa_set.choose_default_ans())
+        # print('ret size', len(ret), ret)
+        return json.dumps(ret)
     
 
 
