@@ -67,14 +67,13 @@ setup(
     install_requires=[
         'pyzmq>=17.1.0',
         'GPUtil>=1.3.0',
-        'torch',
-        'onnx',
-        'onnx_tf',
         'pickle5',
         'packaging'
     ],
     extras_require={
-        'http': ['fastapi', 'flask-json', 'uvicorn']
+        'http': ['fastapi', 'flask-json', 'uvicorn'],
+        'onnx': ['onnx', 'onnx_tf'],
+        'nlp': ["torch", "transformers"]
     },
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
